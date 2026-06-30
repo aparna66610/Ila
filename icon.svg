@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="365 Feminine Control">
+  <rect width="128" height="128" rx="28" fill="#b7664f"/>
+  <path d="M32 36c13-8 25-4 32 6 7-10 19-14 32-6v49c-13-7-25-4-32 6-7-10-19-13-32-6V36Z" fill="#fff7ee"/>
+  <path d="M44 47c8-2 15 2 20 10 5-8 12-12 20-10M64 57v29" stroke="#7d9874" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <circle cx="64" cy="75" r="8" fill="#c96f64"/>
+</svg>
