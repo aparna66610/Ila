@@ -11,6 +11,16 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+## Live demo
+
+This app can be deployed as a static GitHub Pages demo by building with `GITHUB_PAGES=true` and publishing the generated `out` folder to the `gh-pages` branch.
+
+Expected URL:
+
+`https://aparna66610.github.io/Ila/`
+
+If the first deployment does not appear, open the GitHub repository settings, go to Pages, and set the source to deploy from the `gh-pages` branch.
+
 ## What is included
 
 - Mobile-first onboarding for age, life stage, goals, available tools, and method education.

@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const basePath = process.env.GITHUB_PAGES === "true" ? "/Ila" : "";
+
 export const metadata: Metadata = {
   title: "365 Feminine Control",
   description: "Local-first fertility awareness, cycle tracking, and wellness education MVP.",
-  manifest: "/manifest.json",
+  manifest: `${basePath}/manifest.json`,
 };
 
 export const viewport: Viewport = {
