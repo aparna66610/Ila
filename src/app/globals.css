@@ -125,7 +125,7 @@ h2 {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 8px;
   margin-bottom: 18px;
   overflow-x: auto;
@@ -528,6 +528,257 @@ h2 {
   text-anchor: middle;
 }
 
+.method-lab {
+  display: grid;
+  gap: 16px;
+}
+
+.lab-intro {
+  max-width: 82ch;
+}
+
+.lab-grid,
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.lab-control,
+.cycle-scrubber,
+.trace-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  padding: 14px;
+}
+
+.lab-label {
+  color: var(--teal-dark);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.method-button-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.method-button-groups.compact .method-button-group {
+  padding: 8px;
+}
+
+.method-button-group {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #e5f1ef;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.method-button-group > span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.method-button-group > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mini-method {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fcfb;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.mini-method.active {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: white;
+}
+
+.compact-heading {
+  margin-bottom: 8px;
+}
+
+.cycle-scrubber input[type="range"] {
+  accent-color: var(--teal);
+  width: 100%;
+}
+
+.day-strip {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(24px, 1fr));
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.day-chip {
+  display: grid;
+  min-height: 42px;
+  place-items: end center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f3f6f5;
+  opacity: 0.48;
+  padding: 4px;
+}
+
+.day-chip.seen,
+.day-chip.active {
+  background: var(--mucus-color);
+  opacity: 1;
+}
+
+.day-chip.active {
+  border: 3px solid var(--ink);
+}
+
+.day-chip span {
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.legend-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.legend-row i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.lab-status {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  padding: 16px;
+}
+
+.lab-status p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.lab-status h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
+
+.lab-status > span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.lab-status.positive {
+  background: #eaf8ef;
+  border-color: #b9e5c8;
+}
+
+.lab-status.caution {
+  background: #fff6e5;
+  border-color: #f1d18b;
+}
+
+.lab-status.alert {
+  background: var(--rose-soft);
+  border-color: #f0b9c3;
+}
+
+.lab-status.info {
+  background: #eaf4ff;
+  border-color: #b9d6f3;
+}
+
+.lab-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.lab-metrics div {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 8px;
+}
+
+.lab-metrics small {
+  display: block;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.lab-metrics strong {
+  display: block;
+  margin-top: 2px;
+}
+
+.lab-callout {
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  background: #fff7e2;
+  color: #72500d;
+  line-height: 1.5;
+  padding: 12px 14px;
+}
+
+.lab-callout.quiet {
+  border-left-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal-dark);
+}
+
+.trace-panel {
+  background: #132524;
+  color: #dff4f1;
+}
+
+.trace-panel p {
+  color: #dff4f1;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+
+.trace-panel span {
+  color: #75c9c4;
+  font-weight: 900;
+  margin-right: 8px;
+}
+
+.trace-panel .trace-warning {
+  color: #ffd37a;
+}
+
 @media (max-width: 860px) {
   .app-shell,
   .onboarding {
@@ -542,10 +793,12 @@ h2 {
   }
 
   .tabs {
-    grid-template-columns: repeat(6, minmax(92px, 1fr));
+    grid-template-columns: repeat(7, minmax(92px, 1fr));
   }
 
   .content-grid,
+  .lab-grid,
+  .comparison-grid,
   .form-grid,
   .step-grid,
   .settings-grid,

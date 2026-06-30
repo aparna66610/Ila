@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { MethodReplayLab } from "@/components/MethodReplayLab";
 import { SmoothCycleChart } from "@/components/SmoothCycleChart";
 import { buildReminderIcs } from "@/lib/calendarExport";
 import { addDays, formatShortDate, monthGrid, todayIso, uid } from "@/lib/date";
@@ -26,7 +27,7 @@ const lifeStages: { value: LifeStage; label: string }[] = [
 export default function Home() {
   const [data, setData] = useState<AppData>({ ...EMPTY_APP_DATA, updatedAt: new Date().toISOString() });
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"today" | "calendar" | "chart" | "reminders" | "learn" | "settings">("today");
+  const [tab, setTab] = useState<"today" | "calendar" | "chart" | "methodLab" | "reminders" | "learn" | "settings">("today");
 
   useEffect(() => {
     loadEncryptedAppData()
@@ -67,6 +68,7 @@ export default function Home() {
           ["today", "Today"],
           ["calendar", "Calendar"],
           ["chart", "Chart"],
+          ["methodLab", "Method Lab"],
           ["reminders", "Alerts"],
           ["learn", "Learn"],
           ["settings", "Settings"],
@@ -82,6 +84,7 @@ export default function Home() {
       ) : null}
       {tab === "calendar" && currentCycle ? <CalendarView cycle={currentCycle} /> : null}
       {tab === "chart" && currentCycle ? <SmoothCycleChart cycle={currentCycle} interpretation={interpretation} /> : null}
+      {tab === "methodLab" ? <MethodReplayLab /> : null}
       {tab === "reminders" ? <RemindersView data={data} onChange={persist} /> : null}
       {tab === "learn" ? <LearnView data={data} onChange={persist} /> : null}
       {tab === "settings" ? <SettingsView data={data} onChange={persist} /> : null}
