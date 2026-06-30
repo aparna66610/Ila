@@ -66,7 +66,7 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
       canvas.height = height * 2;
       const context = canvas.getContext("2d");
       if (!context) return;
-      context.fillStyle = "#f7fbfa";
+      context.fillStyle = "#fbf3ea";
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.scale(2, 2);
       context.drawImage(image, 0, 0);
@@ -86,7 +86,7 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
     if (!popup) return;
     popup.document.write(`
       <html>
-        <head><title>Cycle chart</title><style>body{margin:0;background:#f7fbfa}svg{width:100%;height:auto}</style></head>
+        <head><title>Cycle chart</title><style>body{margin:0;background:#fbf3ea}svg{width:100%;height:auto}</style></head>
         <body>${svg}<script>window.onload=()=>window.print()</script></body>
       </html>
     `);
@@ -107,14 +107,14 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
       </div>
       <div className="chart-scroll">
         <svg ref={svgRef} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Cycle chart with smooth basal temperature line">
-          <rect width={width} height={height} rx="0" fill="#f7fbfa" />
+          <rect width={width} height={height} rx="0" fill="#fffaf4" />
           <text x="24" y="34" className="chart-title">365 Feminine Control // Cycle chart</text>
           <text x={width - 320} y="34" className="chart-meta">Method: {interpretation.methodId}</text>
           <text x={width - 320} y="60" className="chart-meta">Mode: learning, not contraception</text>
 
           {logs.map((log) => {
             const x = left + (log.cycleDay - 1) * colWidth;
-            return <rect key={`col-${log.id}`} x={x} y={top} width={colWidth - 1} height={620} fill={log.cycleDay % 2 ? "#edf8f6" : "#f3fbfa"} />;
+            return <rect key={`col-${log.id}`} x={x} y={top} width={colWidth - 1} height={620} fill={log.cycleDay % 2 ? "#fff4e8" : "#f8ecdf"} />;
           })}
 
           {Array.from({ length: 12 }, (_, index) => {
@@ -122,7 +122,7 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
             const temp = maxTemp - index * (tempRange / 11);
             return (
               <g key={`temp-line-${index}`}>
-                <line x1={left} x2={left + logs.length * colWidth} y1={y} y2={y} stroke="#d3e7e4" />
+                <line x1={left} x2={left + logs.length * colWidth} y1={y} y2={y} stroke="#eadbca" />
                 <text x={left - 52} y={y + 4} className="axis-label">{temp.toFixed(1)}</text>
               </g>
             );
@@ -131,7 +131,7 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
           <RowLabel y={top + 18} label="Date" />
           <RowLabel y={top + rowHeight + 18} label="Week day" />
           <RowLabel y={top + rowHeight * 2 + 18} label="Cycle day" strong />
-          <rect x={left - 2} y={top + rowHeight * 2} width={logs.length * colWidth + 4} height={rowHeight} fill="#219c9a" opacity="0.9" />
+          <rect x={left - 2} y={top + rowHeight * 2} width={logs.length * colWidth + 4} height={rowHeight} fill="#b7664f" opacity="0.92" />
 
           {logs.map((log) => {
             const x = left + (log.cycleDay - 1) * colWidth + colWidth / 2;
@@ -157,22 +157,22 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
               <g key={`body-${log.id}`}>
                 {log.cervicalFluid && log.cervicalFluid !== "none" ? <text x={x} y={top + rowHeight * 4} className="body-label">{mucusCode(log.cervicalFluid)}</text> : null}
                 {log.lhTest && log.lhTest !== "negative" ? <text x={x} y={top + rowHeight * 5} className="body-label">{log.lhTest === "peak" ? "P" : "H"}</text> : null}
-                {log.bleeding !== "none" ? <rect x={x - 10} y={tempTop + tempHeight + 24} width={20} height={bleedingHeight(log.bleeding)} rx="4" fill="#e87385" /> : null}
+                {log.bleeding !== "none" ? <rect x={x - 10} y={tempTop + tempHeight + 24} width={20} height={bleedingHeight(log.bleeding)} rx="4" fill="#c96f64" /> : null}
                 {log.sensation && log.sensation !== "dry" ? (
                   <text x={x} y={tempTop + tempHeight + 93} className="vertical-label" transform={`rotate(-90 ${x} ${tempTop + tempHeight + 93})`}>
                     {log.sensation}
                   </text>
                 ) : null}
-                {log.intimacy && log.intimacy !== "none" ? <circle cx={x} cy={tempTop + tempHeight + 142} r="8" fill={log.intimacy === "protected" ? "#d9a51f" : "#e87385"} /> : null}
+                {log.intimacy && log.intimacy !== "none" ? <circle cx={x} cy={tempTop + tempHeight + 142} r="8" fill={log.intimacy === "protected" ? "#c49248" : "#c96f64"} /> : null}
               </g>
             );
           })}
 
-          {coverY ? <line x1={left} x2={left + logs.length * colWidth} y1={coverY} y2={coverY} stroke="#219c9a" strokeWidth="3" opacity="0.8" /> : null}
-          {path ? <path d={path} fill="none" stroke="#238f8f" strokeWidth="4" strokeLinecap="round" /> : null}
+          {coverY ? <line x1={left} x2={left + logs.length * colWidth} y1={coverY} y2={coverY} stroke="#7d9874" strokeWidth="3" opacity="0.85" /> : null}
+          {path ? <path d={path} fill="none" stroke="#7d9874" strokeWidth="4" strokeLinecap="round" /> : null}
           {points.map((point) => (
             <g key={`point-${point.day}`}>
-              <circle cx={point.x} cy={point.y} r="8" fill="#238f8f" />
+              <circle cx={point.x} cy={point.y} r="8" fill="#7d9874" />
               <text x={point.x} y={point.y + 4} className="point-label">{point.day > 20 ? "" : ""}</text>
             </g>
           ))}
@@ -181,14 +181,14 @@ export function SmoothCycleChart({ cycle, interpretation }: SmoothCycleChartProp
             const x = left + (annotation.day - 1) * colWidth + colWidth / 2;
             return (
               <g key={`${annotation.label}-${annotation.day}`}>
-                <line x1={x} x2={x} y1={top + 84} y2={tempTop + tempHeight + 160} stroke={annotation.tone === "caution" ? "#e87385" : "#219c9a"} strokeDasharray="6 6" opacity="0.55" />
-                <rect x={x - 54} y={tempTop - 38} width="108" height="24" rx="6" fill="#ffffff" stroke="#b9ded9" />
+                <line x1={x} x2={x} y1={top + 84} y2={tempTop + tempHeight + 160} stroke={annotation.tone === "caution" ? "#c96f64" : "#7d9874"} strokeDasharray="6 6" opacity="0.58" />
+                <rect x={x - 54} y={tempTop - 38} width="108" height="24" rx="6" fill="#fffaf4" stroke="#eadbca" />
                 <text x={x} y={tempTop - 21} className="annotation-label">{annotation.label}</text>
               </g>
             );
           })}
 
-          <rect x="56" y="686" width={width - 112} height="48" rx="8" fill="#ffffff" stroke="#6bbeb8" />
+          <rect x="56" y="686" width={width - 112} height="48" rx="8" fill="#fffaf4" stroke="#d7bd82" />
           <text x="78" y="716" className="chart-footnote">Learning note: chart markers explain observed signs. This MVP does not give contraception clearance.</text>
         </svg>
       </div>

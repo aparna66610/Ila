@@ -57,7 +57,7 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Local-first MVP</p>
+          <p className="eyebrow">Private cycle companion</p>
           <h1>365 Feminine Control</h1>
         </div>
         <div className="topbar-pills">
@@ -124,12 +124,12 @@ function Onboarding({ onComplete }: { onComplete: (data: AppData) => Promise<voi
           <div>
             <div className="brand-mark">365</div>
             <p className="eyebrow">Private cycle literacy</p>
-            <h1>Build your fertility awareness workspace</h1>
-            <p className="subcopy">Track, learn, plan, and set reminders. Avoid-pregnancy mode is education-only in this MVP and does not provide safe-day guidance.</p>
+            <h1>A softer place to understand your body</h1>
+            <p className="subcopy">Track your cycle, learn fertility signs, plan ahead, and keep gentle reminders close by. Avoid-pregnancy mode is education-only in this demo and does not provide safe-day guidance.</p>
           </div>
           <aside className="demo-start-card">
             <p className="eyebrow">Working demo</p>
-            <h2>Skip setup and tour the product</h2>
+            <h2>Start with a warm guided tour</h2>
             <p>Loads sample cycle history, chart markers, alerts, AI summaries, exports, and the Method Lab.</p>
             <button type="button" className="primary-button" onClick={launchDemo}>Launch working demo</button>
           </aside>

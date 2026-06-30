@@ -4,8 +4,8 @@
   "description": "A local-first cycle literacy, fertility awareness, and wellness tracking MVP.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#f7fbfa",
-  "theme_color": "#219c9a",
+  "background_color": "#fbf3ea",
+  "theme_color": "#b7664f",
   "icons": [
     {
       "src": "./icon.svg",

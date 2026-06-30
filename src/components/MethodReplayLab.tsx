@@ -45,11 +45,11 @@ const STATUS_COPY: Record<FertilityStatus, { label: string; text: string; tone: 
 };
 
 const CF_COLORS: Record<string, string> = {
-  none: "#e4ece9",
-  sticky: "#d8c586",
-  creamy: "#f0dca0",
-  watery: "#8fd2e4",
-  eggwhite: "#4eb2cf",
+  none: "#efe6dc",
+  sticky: "#d7bd82",
+  creamy: "#f2d99d",
+  watery: "#b7ccb0",
+  eggwhite: "#7d9874",
 };
 
 const TYPE_LABELS: Record<FabmType, string> = {
