@@ -1,17 +1,17 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { MethodReplayLab } from "@/components/MethodReplayLab";
 import { SmoothCycleChart } from "@/components/SmoothCycleChart";
 import { buildReminderIcs } from "@/lib/calendarExport";
-import { addDays, formatShortDate, monthGrid, todayIso, uid } from "@/lib/date";
+import { addDays, daysBetween, formatShortDate, monthGrid, todayIso, uid } from "@/lib/date";
 import { interpretCurrentCycle } from "@/lib/fertilityInterpretation";
 import { generateInsights } from "@/lib/insights";
 import { buildJsonExport, csvTemplate, cycleToCsv, downloadText, parseAppJson, parseCycleCsv } from "@/lib/importExport";
 import { METHOD_CARDS, methodCardsForProfile, methodIdFromPreference, recommendMethod } from "@/lib/methodPicker";
 import type { AppData, Cycle, DayLog, Goal, LifeStage, MethodPreference, Reminder, TrackingTool } from "@/lib/models";
 import { EMPTY_APP_DATA, GOAL_LABELS, TOOL_LABELS } from "@/lib/models";
-import { createProfile, createStarterAppData } from "@/lib/sampleData";
+import { createDemoAppData, createProfile, createStarterAppData } from "@/lib/sampleData";
 import { clearEncryptedAppData, loadEncryptedAppData, saveEncryptedAppData } from "@/lib/storage";
 
 const goals: Goal[] = ["track_cycle", "plan_pregnancy", "avoid_pregnancy_education", "perimenopause_tracking", "post_menopause_wellness"];
@@ -60,7 +60,10 @@ export default function Home() {
           <p className="eyebrow">Local-first MVP</p>
           <h1>365 Feminine Control</h1>
         </div>
-        <div className="privacy-pill">Encrypted on this device</div>
+        <div className="topbar-pills">
+          {data.profile.isDemo ? <div className="demo-pill">Demo mode</div> : null}
+          <div className="privacy-pill">Encrypted on this device</div>
+        </div>
       </header>
 
       <nav className="tabs" aria-label="App sections">
@@ -80,7 +83,7 @@ export default function Home() {
       </nav>
 
       {tab === "today" ? (
-        <TodayView data={data} interpretation={interpretation} insights={localInsights} onChange={persist} />
+        <TodayView data={data} interpretation={interpretation} insights={localInsights} onChange={persist} onNavigate={setTab} />
       ) : null}
       {tab === "calendar" && currentCycle ? <CalendarView cycle={currentCycle} /> : null}
       {tab === "chart" && currentCycle ? <SmoothCycleChart cycle={currentCycle} interpretation={interpretation} /> : null}
@@ -110,13 +113,27 @@ function Onboarding({ onComplete }: { onComplete: (data: AppData) => Promise<voi
     await onComplete(createStarterAppData(profile, lastPeriodStart));
   }
 
+  async function launchDemo() {
+    await onComplete(createDemoAppData());
+  }
+
   return (
     <main className="onboarding">
       <section className="onboarding-panel">
-        <div className="brand-mark">365</div>
-        <p className="eyebrow">Private cycle literacy</p>
-        <h1>Build your fertility awareness workspace</h1>
-        <p className="subcopy">Track, learn, plan, and set reminders. Avoid-pregnancy mode is education-only in this MVP and does not provide safe-day guidance.</p>
+        <div className="onboarding-hero">
+          <div>
+            <div className="brand-mark">365</div>
+            <p className="eyebrow">Private cycle literacy</p>
+            <h1>Build your fertility awareness workspace</h1>
+            <p className="subcopy">Track, learn, plan, and set reminders. Avoid-pregnancy mode is education-only in this MVP and does not provide safe-day guidance.</p>
+          </div>
+          <aside className="demo-start-card">
+            <p className="eyebrow">Working demo</p>
+            <h2>Skip setup and tour the product</h2>
+            <p>Loads sample cycle history, chart markers, alerts, AI summaries, exports, and the Method Lab.</p>
+            <button type="button" className="primary-button" onClick={launchDemo}>Launch working demo</button>
+          </aside>
+        </div>
 
         <div className="progress"><span style={{ width: `${((step + 1) / 5) * 100}%` }} /></div>
 
@@ -207,13 +224,26 @@ function Onboarding({ onComplete }: { onComplete: (data: AppData) => Promise<voi
   );
 }
 
-function TodayView({ data, interpretation, insights, onChange }: { data: AppData; interpretation: ReturnType<typeof interpretCurrentCycle>; insights: ReturnType<typeof generateInsights>; onChange: (data: AppData) => Promise<void> }) {
+function TodayView({
+  data,
+  interpretation,
+  insights,
+  onChange,
+  onNavigate,
+}: {
+  data: AppData;
+  interpretation: ReturnType<typeof interpretCurrentCycle>;
+  insights: ReturnType<typeof generateInsights>;
+  onChange: (data: AppData) => Promise<void>;
+  onNavigate: (tab: "today" | "calendar" | "chart" | "methodLab" | "reminders" | "learn" | "settings") => void;
+}) {
   const cycle = data.cycles[0];
   const profile = data.profile;
   if (!cycle || !profile) return null;
 
   return (
     <div className="content-grid">
+      {profile.isDemo ? <DemoGuide data={data} onNavigate={onNavigate} /> : null}
       <section className="panel status-panel">
         <p className="eyebrow">Current chart read</p>
         <h2>{interpretation.trackingStatus}</h2>
@@ -257,7 +287,7 @@ function TodayView({ data, interpretation, insights, onChange }: { data: AppData
 function DailyLogForm({ data, onChange }: { data: AppData; onChange: (data: AppData) => Promise<void> }) {
   const cycle = data.cycles[0];
   const today = todayIso();
-  const existing = cycle.logs.find((log) => log.date === today) ?? cycle.logs[cycle.logs.length - 1];
+  const existing = cycle.logs.find((log) => log.date === today) ?? createBlankLogForDate(cycle, today);
   const [draft, setDraft] = useState<DayLog>(existing);
 
   useEffect(() => setDraft(existing), [existing?.id]);
@@ -266,7 +296,8 @@ function DailyLogForm({ data, onChange }: { data: AppData; onChange: (data: AppD
     const logs = cycle.logs.some((log) => log.id === draft.id)
       ? cycle.logs.map((log) => (log.id === draft.id ? draft : log))
       : [...cycle.logs, draft];
-    await onChange({ ...data, cycles: [{ ...cycle, logs }, ...data.cycles.slice(1)] });
+    const sortedLogs = logs.sort((a, b) => a.cycleDay - b.cycleDay);
+    await onChange({ ...data, cycles: [{ ...cycle, logs: sortedLogs }, ...data.cycles.slice(1)] });
   }
 
   return (
@@ -345,7 +376,7 @@ function CalendarView({ cycle }: { cycle: Cycle }) {
           return (
             <div key={date} className={log || expected ? "calendar-day marked" : "calendar-day"}>
               <span>{new Date(`${date}T12:00:00`).getDate()}</span>
-              {log?.bleeding !== "none" ? <small className="dot period">Period</small> : null}
+              {log && log.bleeding !== "none" ? <small className="dot period">Period</small> : null}
               {log?.cervicalFluid === "watery" || log?.cervicalFluid === "eggwhite" ? <small className="dot fertile">Signs</small> : null}
               {expected ? <small className="dot expected">Expected</small> : null}
             </div>
@@ -485,6 +516,7 @@ function SettingsView({ data, onChange }: { data: AppData; onChange: (data: AppD
         <article className="setting-block">
           <strong>Data storage</strong>
           <p>Your data is encrypted in this browser using Web Crypto and IndexedDB. Bring-your-own-cloud sync is planned after the MVP.</p>
+          <button type="button" className="secondary-button" onClick={() => onChange(createDemoAppData())}>Reload demo data</button>
         </article>
         <article className="setting-block">
           <strong>AI insights</strong>
@@ -550,6 +582,56 @@ function InfoTile({ title, body, active = false }: { title: string; body: string
       <p>{body}</p>
     </article>
   );
+}
+
+function DemoGuide({
+  data,
+  onNavigate,
+}: {
+  data: AppData;
+  onNavigate: (tab: "today" | "calendar" | "chart" | "methodLab" | "reminders" | "learn" | "settings") => void;
+}) {
+  const cycle = data.cycles[0];
+  const loggedDays = cycle?.logs.length ?? 0;
+  const bbtDays = cycle?.logs.filter((log) => log.bbt).length ?? 0;
+  const reminders = data.reminders.filter((reminder) => reminder.enabled).length;
+
+  return (
+    <section className="panel demo-guide">
+      <div>
+        <p className="eyebrow">Demo script</p>
+        <h2>This account is ready to click through</h2>
+      </div>
+      <div className="demo-metrics">
+        <span><strong>{loggedDays}</strong> charted days</span>
+        <span><strong>{bbtDays}</strong> BBT points</span>
+        <span><strong>{reminders}</strong> active alerts</span>
+      </div>
+      <div className="demo-actions">
+        <button type="button" className="primary-button" onClick={() => onNavigate("chart")}>View smooth chart</button>
+        <button type="button" className="secondary-button" onClick={() => onNavigate("methodLab")}>Try Method Lab</button>
+        <button type="button" className="secondary-button" onClick={() => onNavigate("reminders")}>Export alerts</button>
+        <button type="button" className="secondary-button" onClick={() => onNavigate("settings")}>Export data</button>
+      </div>
+    </section>
+  );
+}
+
+function createBlankLogForDate(cycle: Cycle, date: string): DayLog {
+  const cycleDay = Math.max(1, daysBetween(cycle.startDate, date) + 1);
+  return {
+    id: uid("log"),
+    date,
+    cycleDay,
+    bleeding: "none",
+    cervicalFluid: "none",
+    sensation: "dry",
+    bbtDisturbed: false,
+    intimacy: "none",
+    symptoms: [],
+    mood: "steady",
+    notes: "",
+  };
 }
 
 function toggle<T>(items: T[], item: T): T[] {

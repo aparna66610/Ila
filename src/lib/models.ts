@@ -58,6 +58,7 @@ export interface UserProfile {
   methodPreference: MethodPreference;
   selectedMethodId?: string;
   aiInsightsOptIn: boolean;
+  isDemo?: boolean;
   privacyMode: "local_encrypted";
   onboardedAt: string;
 }

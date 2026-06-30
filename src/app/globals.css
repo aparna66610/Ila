@@ -109,6 +109,7 @@ h2 {
 }
 
 .privacy-pill,
+.demo-pill,
 .status-dot {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -121,6 +122,19 @@ h2 {
 
 .status-dot.on {
   background: var(--teal-soft);
+}
+
+.topbar-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.demo-pill {
+  border-color: #f1d18b;
+  background: #fff6e5;
+  color: #7a5410;
 }
 
 .tabs {
@@ -290,6 +304,13 @@ h2 {
   gap: 18px;
 }
 
+.onboarding-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
 .brand-mark {
   display: grid;
   width: 64px;
@@ -299,6 +320,22 @@ h2 {
   background: var(--teal);
   color: white;
   font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.demo-start-card {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  border: 1px solid #f1d18b;
+  border-radius: 8px;
+  background: #fff8e8;
+  padding: 16px;
+}
+
+.demo-start-card p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .progress {
@@ -378,6 +415,40 @@ h2 {
 .insight,
 .setting-block {
   padding: 14px;
+}
+
+.demo-guide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(33, 156, 154, 0.14), rgba(255, 246, 229, 0.9)),
+    white;
+}
+
+.demo-metrics,
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-metrics span {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--teal-dark);
+  font-weight: 850;
+  padding: 8px 11px;
+}
+
+.demo-metrics strong {
+  margin-right: 4px;
+}
+
+.demo-actions {
+  grid-column: 1 / -1;
 }
 
 .stat-row {
@@ -787,9 +858,14 @@ h2 {
 
   .topbar,
   .section-heading,
-  .reminder-row {
+  .reminder-row,
+  .demo-guide {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .topbar-pills {
+    justify-content: flex-start;
   }
 
   .tabs {
@@ -799,8 +875,10 @@ h2 {
   .content-grid,
   .lab-grid,
   .comparison-grid,
+  .demo-guide,
   .form-grid,
   .step-grid,
+  .onboarding-hero,
   .settings-grid,
   .choice-grid {
     grid-template-columns: 1fr;

@@ -19,6 +19,8 @@ Expected URL:
 
 `https://aparna66610.github.io/Ila/`
 
+For the demo walkthrough, open the URL and click **Launch working demo** to load sample cycle history, chart markers, reminders, exports, and the Method Lab.
+
 If the first deployment does not appear, open the GitHub repository settings, go to Pages, and set the source to deploy from the `gh-pages` branch.
 
 ## What is included

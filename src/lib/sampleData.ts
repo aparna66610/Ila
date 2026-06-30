@@ -9,6 +9,7 @@ export function createProfile(input: {
   methodPreference: MethodPreference;
   selectedMethodId?: string;
   aiInsightsOptIn?: boolean;
+  isDemo?: boolean;
 }): UserProfile {
   return {
     id: uid("profile"),
@@ -19,6 +20,7 @@ export function createProfile(input: {
     methodPreference: input.methodPreference,
     selectedMethodId: input.selectedMethodId,
     aiInsightsOptIn: input.aiInsightsOptIn ?? false,
+    isDemo: input.isDemo,
     privacyMode: "local_encrypted",
     onboardedAt: new Date().toISOString(),
   };
@@ -104,6 +106,64 @@ export function createStarterAppData(profile: UserProfile, lastPeriodStart?: str
     cycles: [cycle],
     reminders: createStarterReminders(todayIso()),
     imports: [],
+    insights: [],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function createDemoAppData(): AppData {
+  const profile = createProfile({
+    age: 32,
+    lifeStage: "cycling",
+    goals: ["track_cycle", "plan_pregnancy", "avoid_pregnancy_education"],
+    tools: ["manual_bbt", "cervical_mucus", "lh_tests", "calendar_history"],
+    methodPreference: "symptothermal",
+    selectedMethodId: "sensiplan",
+    aiInsightsOptIn: true,
+    isDemo: true,
+  });
+  const current = createStarterCycle(addDays(todayIso(), -18));
+  const previousOne = createStarterCycle(addDays(todayIso(), -48));
+  const previousTwo = createStarterCycle(addDays(todayIso(), -77));
+  const previousThree = createStarterCycle(addDays(todayIso(), -105));
+  const reminders = [
+    ...createStarterReminders(todayIso()),
+    {
+      id: uid("reminder"),
+      kind: "lh_testing",
+      title: "LH test window",
+      message: "Demo reminder: start LH testing around the fertile-sign window.",
+      date: addDays(todayIso(), 2),
+      time: "10:00",
+      repeats: "none",
+      enabled: true,
+    } satisfies Reminder,
+    {
+      id: uid("reminder"),
+      kind: "bbt_logging",
+      title: "Morning BBT",
+      message: "Demo reminder: log temperature before getting up.",
+      date: todayIso(),
+      time: "07:00",
+      repeats: "daily",
+      enabled: true,
+    } satisfies Reminder,
+  ];
+
+  return {
+    version: 1,
+    profile,
+    cycles: [current, previousOne, previousTwo, previousThree],
+    reminders,
+    imports: [
+      {
+        id: uid("import"),
+        source: "app_json",
+        importedAt: new Date().toISOString(),
+        status: "placeholder",
+        summary: "Demo account seeded with sample cycle history, chart markers, and reminders.",
+      },
+    ],
     insights: [],
     updatedAt: new Date().toISOString(),
   };
