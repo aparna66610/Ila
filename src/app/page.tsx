@@ -1,9 +1,11 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState } from "react";
+import { AiResearchLab } from "@/components/AiResearchLab";
 import { MethodReplayLab } from "@/components/MethodReplayLab";
 import { SmoothCycleChart } from "@/components/SmoothCycleChart";
 import { buildReminderIcs } from "@/lib/calendarExport";
+import { evaluateCustomAiAlgorithm, type CustomAiAlgorithmReport } from "@/lib/customAiAlgorithm";
 import { addDays, daysBetween, formatShortDate, monthGrid, todayIso, uid } from "@/lib/date";
 import { interpretCurrentCycle } from "@/lib/fertilityInterpretation";
 import { generateInsights } from "@/lib/insights";
@@ -16,6 +18,7 @@ import { clearEncryptedAppData, loadEncryptedAppData, saveEncryptedAppData } fro
 
 const goals: Goal[] = ["track_cycle", "plan_pregnancy", "avoid_pregnancy_education", "perimenopause_tracking", "post_menopause_wellness"];
 const tools: TrackingTool[] = ["manual_bbt", "apple_watch", "oura", "lh_tests", "cervical_mucus", "cervix", "calendar_history"];
+type AppTab = "today" | "calendar" | "chart" | "methodLab" | "aiLab" | "reminders" | "learn" | "settings";
 const lifeStages: { value: LifeStage; label: string }[] = [
   { value: "cycling", label: "Cycling" },
   { value: "postpartum", label: "Postpartum" },
@@ -27,7 +30,7 @@ const lifeStages: { value: LifeStage; label: string }[] = [
 export default function Home() {
   const [data, setData] = useState<AppData>({ ...EMPTY_APP_DATA, updatedAt: new Date().toISOString() });
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"today" | "calendar" | "chart" | "methodLab" | "reminders" | "learn" | "settings">("today");
+  const [tab, setTab] = useState<AppTab>("today");
 
   useEffect(() => {
     loadEncryptedAppData()
@@ -52,6 +55,7 @@ export default function Home() {
   const currentCycle = data.cycles[0];
   const interpretation = interpretCurrentCycle(data);
   const localInsights = data.profile.aiInsightsOptIn ? generateInsights(data) : [];
+  const algorithmReport = data.profile.aiInsightsOptIn ? evaluateCustomAiAlgorithm(data) : undefined;
 
   return (
     <main className="app-shell">
@@ -72,22 +76,24 @@ export default function Home() {
           ["calendar", "Calendar"],
           ["chart", "Chart"],
           ["methodLab", "Method Lab"],
+          ["aiLab", "AI Lab"],
           ["reminders", "Alerts"],
           ["learn", "Learn"],
           ["settings", "Settings"],
         ].map(([id, label]) => (
-          <button key={id} type="button" className={tab === id ? "active" : ""} onClick={() => setTab(id as typeof tab)}>
+          <button key={id} type="button" className={tab === id ? "active" : ""} onClick={() => setTab(id as AppTab)}>
             {label}
           </button>
         ))}
       </nav>
 
       {tab === "today" ? (
-        <TodayView data={data} interpretation={interpretation} insights={localInsights} onChange={persist} onNavigate={setTab} />
+        <TodayView data={data} interpretation={interpretation} insights={localInsights} algorithmReport={algorithmReport} onChange={persist} onNavigate={setTab} />
       ) : null}
       {tab === "calendar" && currentCycle ? <CalendarView cycle={currentCycle} /> : null}
       {tab === "chart" && currentCycle ? <SmoothCycleChart cycle={currentCycle} interpretation={interpretation} /> : null}
       {tab === "methodLab" ? <MethodReplayLab /> : null}
+      {tab === "aiLab" ? <AiResearchLab data={data} onChange={persist} /> : null}
       {tab === "reminders" ? <RemindersView data={data} onChange={persist} /> : null}
       {tab === "learn" ? <LearnView data={data} onChange={persist} /> : null}
       {tab === "settings" ? <SettingsView data={data} onChange={persist} /> : null}
@@ -102,6 +108,7 @@ function Onboarding({ onComplete }: { onComplete: (data: AppData) => Promise<voi
   const [selectedGoals, setSelectedGoals] = useState<Goal[]>(["track_cycle"]);
   const [selectedTools, setSelectedTools] = useState<TrackingTool[]>(["manual_bbt", "cervical_mucus"]);
   const [methodPreference, setMethodPreference] = useState<MethodPreference>("pick_for_me");
+  const [aiResearchEnabled, setAiResearchEnabled] = useState(true);
   const [lastPeriodStart, setLastPeriodStart] = useState(addDays(todayIso(), -18));
   const previewProfile = createProfile({ age, lifeStage, goals: selectedGoals, tools: selectedTools, methodPreference });
   const recommended = recommendMethod(previewProfile);
@@ -109,7 +116,7 @@ function Onboarding({ onComplete }: { onComplete: (data: AppData) => Promise<voi
 
   async function finish() {
     const selectedMethodId = methodPreference === "pick_for_me" ? recommended.methodId : methodIdFromPreference(methodPreference, previewProfile);
-    const profile = createProfile({ age, lifeStage, goals: selectedGoals, tools: selectedTools, methodPreference, selectedMethodId });
+    const profile = createProfile({ age, lifeStage, goals: selectedGoals, tools: selectedTools, methodPreference, selectedMethodId, aiInsightsOptIn: aiResearchEnabled });
     await onComplete(createStarterAppData(profile, lastPeriodStart));
   }
 
@@ -208,6 +215,13 @@ function Onboarding({ onComplete }: { onComplete: (data: AppData) => Promise<voi
                 </button>
               ))}
             </div>
+            <label className="consent-card">
+              <input type="checkbox" checked={aiResearchEnabled} onChange={(event) => setAiResearchEnabled(event.target.checked)} />
+              <span>
+                <strong>Enable local AI insights and the Ila research algorithm</strong>
+                <small>Uses only logged data on this device for non-diagnostic summaries and training-readiness previews. You can turn it off later.</small>
+              </span>
+            </label>
           </div>
         ) : null}
 
@@ -228,14 +242,16 @@ function TodayView({
   data,
   interpretation,
   insights,
+  algorithmReport,
   onChange,
   onNavigate,
 }: {
   data: AppData;
   interpretation: ReturnType<typeof interpretCurrentCycle>;
   insights: ReturnType<typeof generateInsights>;
+  algorithmReport?: CustomAiAlgorithmReport;
   onChange: (data: AppData) => Promise<void>;
-  onNavigate: (tab: "today" | "calendar" | "chart" | "methodLab" | "reminders" | "learn" | "settings") => void;
+  onNavigate: (tab: AppTab) => void;
 }) {
   const cycle = data.cycles[0];
   const profile = data.profile;
@@ -275,6 +291,15 @@ function TodayView({
                 <p>{insight.body}</p>
               </article>
             ))}
+            {algorithmReport ? (
+              <article className="insight algorithm-preview">
+                <div>
+                  <strong>{algorithmReport.modelName}</strong>
+                  <p>{algorithmReport.summary}</p>
+                </div>
+                <button type="button" className="secondary-button" onClick={() => onNavigate("aiLab")}>Open AI Lab</button>
+              </article>
+            ) : null}
           </div>
         ) : (
           <p className="muted">AI summaries are off. You can enable local, non-diagnostic summaries in Settings.</p>
@@ -519,15 +544,15 @@ function SettingsView({ data, onChange }: { data: AppData; onChange: (data: AppD
           <button type="button" className="secondary-button" onClick={() => onChange(createDemoAppData())}>Reload demo data</button>
         </article>
         <article className="setting-block">
-          <strong>AI insights</strong>
-          <p>Opt-in summaries use only your logged data. No photo analysis, diagnosis, or contraception decisions.</p>
+          <strong>AI insights + research algorithm</strong>
+          <p>Opt-in summaries and the Ila Custom AI Algorithm run locally from logged data. No photo analysis, diagnosis, pregnancy prediction, or contraception decisions.</p>
           <label className="switch">
             <input
               type="checkbox"
               checked={profile.aiInsightsOptIn}
               onChange={(event) => onChange({ ...data, profile: { ...profile, aiInsightsOptIn: event.target.checked }, insights: event.target.checked ? generateInsights({ ...data, profile: { ...profile, aiInsightsOptIn: true } }) : [] })}
             />
-            Enable summaries
+            Enable AI Lab
           </label>
         </article>
         <article className="setting-block">
@@ -589,7 +614,7 @@ function DemoGuide({
   onNavigate,
 }: {
   data: AppData;
-  onNavigate: (tab: "today" | "calendar" | "chart" | "methodLab" | "reminders" | "learn" | "settings") => void;
+  onNavigate: (tab: AppTab) => void;
 }) {
   const cycle = data.cycles[0];
   const loggedDays = cycle?.logs.length ?? 0;
@@ -609,6 +634,7 @@ function DemoGuide({
       </div>
       <div className="demo-actions">
         <button type="button" className="primary-button" onClick={() => onNavigate("chart")}>View smooth chart</button>
+        <button type="button" className="secondary-button" onClick={() => onNavigate("aiLab")}>Open AI Lab</button>
         <button type="button" className="secondary-button" onClick={() => onNavigate("methodLab")}>Try Method Lab</button>
         <button type="button" className="secondary-button" onClick={() => onNavigate("reminders")}>Export alerts</button>
         <button type="button" className="secondary-button" onClick={() => onNavigate("settings")}>Export data</button>

@@ -19,7 +19,7 @@ Expected URL:
 
 `https://aparna66610.github.io/Ila/`
 
-For the demo walkthrough, open the URL and click **Launch working demo** to load sample cycle history, chart markers, reminders, exports, and the Method Lab.
+For the demo walkthrough, open the URL and click **Launch working demo** to load sample cycle history, chart markers, reminders, exports, the Method Lab, and the AI Lab.
 
 If the first deployment does not appear, open the GitHub repository settings, go to Pages, and set the source to deploy from the `gh-pages` branch.
 
@@ -32,7 +32,7 @@ If the first deployment does not appear, open the GitHub repository settings, go
 - Manual daily logging for bleeding, BBT, mucus, sensation, LH tests, cervix context, intimacy, symptoms, mood, and notes.
 - Smooth SVG cycle chart with temperature smoothing, coverline, mucus/LH/bleeding/intimacy rows, and PNG/PDF export.
 - JSON/CSV import and export, CSV template, and `.ics` reminder export for Apple Calendar and Google Calendar.
-- Opt-in AI-style summaries based only on locally logged data.
+- Opt-in AI-style summaries plus the Ila Custom AI Algorithm research layer with visible training, validation, and testing gates.
 
 ## Safety boundary
 

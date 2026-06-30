@@ -112,7 +112,7 @@ export interface Insight {
   createdAt: string;
   title: string;
   body: string;
-  category: "cycle_pattern" | "logging" | "wellness" | "education";
+  category: "cycle_pattern" | "logging" | "wellness" | "education" | "algorithm_research";
 }
 
 export interface AppData {

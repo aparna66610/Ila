@@ -1,5 +1,6 @@
 import type { AppData, Insight } from "./models.ts";
 import { daysBetween, uid } from "./date.ts";
+import { evaluateCustomAiAlgorithm } from "./customAiAlgorithm.ts";
 
 export function generateInsights(data: AppData): Insight[] {
   if (!data.profile?.aiInsightsOptIn) return [];
@@ -45,6 +46,28 @@ export function generateInsights(data: AppData): Insight[] {
         title: "Recurring note",
         body: `${topSymptom[0]} appears ${topSymptom[1]} time${topSymptom[1] === 1 ? "" : "s"} in this cycle. You can bring repeated patterns to a clinician or educator.`,
         category: "wellness",
+      });
+    }
+  }
+
+  const algorithmReport = evaluateCustomAiAlgorithm(data);
+  if (algorithmReport) {
+    insights.push({
+      id: uid("insight"),
+      createdAt: now,
+      title: "Custom algorithm research",
+      body: `${algorithmReport.modelName} is running in ${algorithmReport.readinessLabel} with a ${algorithmReport.readinessScore}% readiness score. It is for research summaries only.`,
+      category: "algorithm_research",
+    });
+
+    const nextRecommendation = algorithmReport.recommendations[0];
+    if (nextRecommendation) {
+      insights.push({
+        id: uid("insight"),
+        createdAt: now,
+        title: "Next model step",
+        body: nextRecommendation,
+        category: "algorithm_research",
       });
     }
   }
